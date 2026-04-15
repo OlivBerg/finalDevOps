@@ -1,0 +1,57 @@
+# Terraform
+.terraform/
+.terraform.tfstate
+.terraform.tfstate.*
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+*.tfplan
+tfplan
+
+# Local Terraform variables and backend config (keep *.example in git)
+*.tfvars
+*.auto.tfvars
+!*.tfvars.example
+!terraform.tfvars.example
+backend.hcl
+
+# Node / Remix (repo root and remix-codebase/)
+node_modules/
+**/node_modules/
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+dist/
+**/dist/
+build/
+**/build/
+.cache/
+**/.cache/
+public/build/
+**/public/build/
+
+# Secrets & environment
+.env
+.env.*
+!.env.example
+
+# IDE & tooling
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test / coverage
+coverage/
+.nyc_output/
+
+# Logs
+*.log
