@@ -1,8 +1,0 @@
-./*
-./vscode
-*.tfstate
-*.tfstate.backup
-.terraform/
-node_modules/
-app/build/
-.env
