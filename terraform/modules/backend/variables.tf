@@ -13,11 +13,6 @@ variable "storage_account_name" {
   type        = string
 }
 
-variable "container_name" {
-  description = "Blob container name for Terraform state files."
-  type        = string
-}
-
 variable "tags" {
   description = "Optional tags for resources."
   type        = map(string)
