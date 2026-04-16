@@ -1,3 +1,8 @@
+locals {
+  # One Azure blob container per environment so dev / test / prod Terraform state stay isolated.
+  state_environments = toset(["dev", "test", "prod"])
+}
+
 resource "azurerm_resource_group" "tfstate" {
   name     = var.resource_group_name
   location = var.location
@@ -20,7 +25,9 @@ resource "azurerm_storage_account" "tfstate" {
 }
 
 resource "azurerm_storage_container" "tfstate" {
-  name                  = var.container_name
+  for_each = local.state_environments
+
+  name                  = "tfstate-${each.key}"
   storage_account_name  = azurerm_storage_account.tfstate.name
   container_access_type = "private"
 }

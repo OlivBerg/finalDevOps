@@ -1,9 +1,13 @@
-# Copy to backend.hcl (gitignored). Values come from terraform/bootstrap outputs.
-
 resource_group_name  = "finaldevops-rg"
 storage_account_name = "stateblob"
-container_name       = "state-storage"
-key                  = "cst8918.tfstate"
+
+container_name = "tfstate-prod"
+key            = "cst8918.tfstate"
+
+# Alternatives — use only one container_name at a time:
+#   Dev:  container_name = "tfstate-dev"
+#   Test: container_name = "tfstate-test"
+#   Prod: container_name = "tfstate-prod"
 
 # use_oidc = true   # GitHub Actions
-# use_oidc = false  # local az login + storage key or Azure AD
+# use_oidc = false  # local az login + Azure AD to storage
