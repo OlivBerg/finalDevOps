@@ -1,7 +1,7 @@
 resource_group_name  = "finaldevops-rg"
 storage_account_name = "stateblob"
 
-container_name = "tfstate-dev"
+container_name = "tfstate-prod"
 key            = "cst8918.tfstate"
 
 # Alternatives — use only one container_name at a time:

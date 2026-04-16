@@ -80,14 +80,15 @@ If this was already applied, skip to the next section.
 From `**terraform/environments/main/**`:
 
 1. **Sign in** (`az login`) and **select the correct subscription** (see above).
-2. **Backend configuration:** copy the example and set **`container_name`** to **`tfstate-dev`**, **`tfstate-test`**, or **`tfstate-prod`** (`backend.hcl.example` defaults to **dev** for this root).
-
-```hcl
-container_name = "tfstate-dev" # dev/test/prod
-```
+2. **Backend configuration:** copy the example and set **`container_name`** to **`tfstate-dev`**, **`tfstate-test`**, or **`tfstate-prod`** (`backend.hcl.example` defaults to **prod** for this root).
 
 ```bash
  cp backend.hcl.example backend.hcl
+```
+
+```hcl
+# Then edit the backend.hcl directly, the default is prod so make sure to change it to dev
+container_name = "tfstate-dev" # dev/test/prod
 ```
 
 `backend.hcl` is **gitignored**; do not commit secrets. With **`az login`**, Terraform can use Azure AD to access the storage account (**Contributor** on the subscription usually covers it). For **GitHub Actions**, use OIDC and set `use_oidc = true` in `backend.hcl` (see your CI workflow). 3. **Initialize** (downloads providers and connects the backend; may prompt to migrate state if you switched backends):
