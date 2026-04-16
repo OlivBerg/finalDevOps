@@ -1,10 +1,3 @@
----
-name: ""
-overview: ""
-todos: []
-isProject: false
----
-
 # Plan
 
 ## Person 1 -- Terraform Backend + Network Module + Repo Setup -> Me Olive
