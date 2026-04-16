@@ -1,0 +1,8 @@
+# Copy to terraform.tfvars (gitignored). Configure backend via backend.hcl after bootstrap.
+
+group_number = "4"
+location     = "canadacentral"
+
+tags = {
+  project = "cst8918-final"
+}
