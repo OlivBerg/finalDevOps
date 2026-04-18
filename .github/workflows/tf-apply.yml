@@ -2,7 +2,7 @@ name: 'TF Apply'
 on:
   push:
     branches: [ main ]
-
+    paths: [ 'terraform/**' ]
 permissions:
   id-token: write
   contents: read
@@ -19,6 +19,6 @@ jobs:
       - uses: actions/checkout@v4
       - uses: hashicorp/setup-terraform@v3
       - run: terraform init
-        working-directory: ./infra
+        working-directory: ./terraform
       - run: terraform apply -auto-approve
-        working-directory: ./infra
+        working-directory: ./terraform

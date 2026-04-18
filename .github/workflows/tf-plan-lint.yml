@@ -2,7 +2,7 @@ name: 'TF Plan & Lint'
 on:
   pull_request:
     branches: [ main ]
-
+    paths: [ 'terraform/**' ]
 permissions:
   id-token: write
   contents: read
@@ -23,12 +23,12 @@ jobs:
         run: |
           tflint --init
           tflint
-        working-directory: ./infra
+        working-directory: ./terraform
 
       - uses: hashicorp/setup-terraform@v3
       - run: terraform init
-        working-directory: ./infra
+        working-directory: ./terraform
         
       - name: Terraform Plan
         run: terraform plan -input=false
-        working-directory: ./infra
+        working-directory: ./terraform
