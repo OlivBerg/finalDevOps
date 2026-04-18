@@ -57,7 +57,7 @@ Terraform must remember what it created (resource IDs, dependencies). For a team
 
 - **Azure Storage Account** (blob) holds the state file(s).
 - This repo bootstraps that storage under [`terraform/bootstrap/`](terraform/bootstrap) (applied **once**, with **local** `terraform.tfstate` only for that bootstrap folder).
-- Bootstrap creates **three** blob containers so you can keep **separate Terraform states**: **`tfstate-dev`**, **`tfstate-test`**, and **`tfstate-prod`** (same storage account **`stateblob`**, RG **`finaldevops-rg`**). Each container typically stores one blob named `cst8918.tfstate` unless you choose a different `key` in `backend.hcl`.
+- Bootstrap creates **three** blob containers so you can keep **separate Terraform states**: **`tfstate-dev`**, **`tfstate-test`**, and **`tfstate-prod`** (same storage account **`stateblob`**, RG **`finaldevops-rg`**).
 - The stack in [`terraform/environments/main/`](terraform/environments/main) uses the **azurerm** backend; the example [`backend.hcl.example`](terraform/environments/main/backend.hcl.example) points at **`tfstate-prod`** by default. Use **`tfstate-dev`** or **`tfstate-test`** in `backend.hcl` when you want isolated state for experiments or staging (swap `container_name`, same pattern).
 
 After bootstrap, teammates use the **same** storage account but **pick the container** that matches the environment they are managing — **dev**, **test**, and **prod** states do not overwrite each other.
