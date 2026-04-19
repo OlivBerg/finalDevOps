@@ -7,36 +7,42 @@ module "network" {
   tags                = var.tags
 }
 
-# AKS Clusters 
+# ---------------------------------------------------------------------------
+# AKS Clusters (Person 2)
+# ---------------------------------------------------------------------------
 
 module "aks_test" {
   source = "../../modules/aks"
 
-  cluster_name        = "aks-test-${var.group_number}"
-  location            = var.location
-  resource_group_name = module.network.resource_group_name
-  dns_prefix          = "aks-test-${var.group_number}"
-  subnet_id           = module.network.subnet_ids["test"]
-  node_count          = 1
-  min_count           = 1
-  max_count           = 1 # auto-scaling disabled for test
-  vm_size             = "Standard_B2s"
-  kubernetes_version  = "1.32"
-  environment         = "test"
+  cluster_name                    = "aks-test-${var.group_number}"
+  location                        = var.location
+  resource_group_name             = module.network.resource_group_name
+  dns_prefix                      = "aks-test-${var.group_number}"
+  subnet_id                       = module.network.subnet_ids["test"]
+  node_count                      = 1
+  min_count                       = 1
+  max_count                       = 1 # auto-scaling disabled for test
+  vm_size                         = "Standard_B2s"
+  kubernetes_version              = "1.32"
+  environment                     = "test"
+  log_analytics_workspace_id      = var.log_analytics_workspace_id
+  api_server_authorized_ip_ranges = var.api_server_authorized_ip_ranges
 }
 
 module "aks_prod" {
   source = "../../modules/aks"
 
-  cluster_name        = "aks-prod-${var.group_number}"
-  location            = var.location
-  resource_group_name = module.network.resource_group_name
-  dns_prefix          = "aks-prod-${var.group_number}"
-  subnet_id           = module.network.subnet_ids["prod"]
-  node_count          = 1
-  min_count           = 1
-  max_count           = 3 # auto-scaling enabled for prod
-  vm_size             = "Standard_B2s"
-  kubernetes_version  = "1.32"
-  environment         = "prod"
+  cluster_name                    = "aks-prod-${var.group_number}"
+  location                        = var.location
+  resource_group_name             = module.network.resource_group_name
+  dns_prefix                      = "aks-prod-${var.group_number}"
+  subnet_id                       = module.network.subnet_ids["prod"]
+  node_count                      = 1
+  min_count                       = 1
+  max_count                       = 3 # auto-scaling enabled for prod
+  vm_size                         = "Standard_B2s"
+  kubernetes_version              = "1.32"
+  environment                     = "prod"
+  log_analytics_workspace_id      = var.log_analytics_workspace_id
+  api_server_authorized_ip_ranges = var.api_server_authorized_ip_ranges
 }

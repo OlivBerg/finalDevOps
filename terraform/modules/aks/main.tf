@@ -5,6 +5,9 @@ resource "azurerm_kubernetes_cluster" "main" {
   dns_prefix          = var.dns_prefix
   kubernetes_version  = var.kubernetes_version
 
+  # CRITICAL: limit API server access to specific IP ranges
+  api_server_authorized_ip_ranges = var.api_server_authorized_ip_ranges
+
   default_node_pool {
     name                = "default"
     node_count          = var.max_count > var.min_count ? null : var.node_count
@@ -13,6 +16,20 @@ resource "azurerm_kubernetes_cluster" "main" {
     enable_auto_scaling = var.max_count > var.min_count
     vm_size             = var.vm_size
     vnet_subnet_id      = var.subnet_id
+  }
+
+  # HIGH: enable RBAC
+  role_based_access_control_enabled = true
+
+  # HIGH: configure network policy
+  network_profile {
+    network_plugin = "azure"
+    network_policy = "azure"
+  }
+
+  # MEDIUM: enable OMS agent logging
+  oms_agent {
+    log_analytics_workspace_id = var.log_analytics_workspace_id
   }
 
   identity {

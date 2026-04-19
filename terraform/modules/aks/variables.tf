@@ -57,3 +57,14 @@ variable "environment" {
   description = "Environment tag (e.g. dev, test, prod)."
   type        = string
 }
+
+variable "api_server_authorized_ip_ranges" {
+  description = "List of IP ranges allowed to access the Kubernetes API server. Use [\"0.0.0.0/0\"] only for dev/test."
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+}
+
+variable "log_analytics_workspace_id" {
+  description = "Resource ID of the Log Analytics workspace for OMS agent logging."
+  type        = string
+}
