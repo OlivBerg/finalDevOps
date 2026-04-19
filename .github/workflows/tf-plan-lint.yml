@@ -28,7 +28,8 @@ jobs:
         working-directory: ./terraform/environments/main
 
       - uses: hashicorp/setup-terraform@v3
-      - run: terraform init
+      - name: Terraform Init
+        run: terraform init -input=false -backend-config=backend.github.test.hcl
         working-directory: ./terraform/environments/main
 
       - name: Terraform Plan

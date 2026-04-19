@@ -1,48 +1,24 @@
-# base node image
-FROM node:lts-alpine as base
+# Stage 1: install deps + build
+FROM node:20-alpine AS build
 
-# update the openssl package to apply a security patch @see CVE-2023-6129⁠
-RUN apk -U add --update-cache openssl
+WORKDIR /app
 
-# set for base and all layer that inherit from it
-ENV NODE_ENV=production
+COPY package.json package-lock.json ./
+RUN npm ci
 
-# Install all node_modules, including dev dependencies
-FROM base as deps
+COPY . .
+RUN npm run build && npm prune --omit=dev
 
-WORKDIR /usr/src/app
+# Stage 2: production image
+FROM node:20-alpine
 
-ADD package.json ./
-RUN npm install --include=dev
+WORKDIR /app
 
-# Setup production node_modules
-FROM base as production-deps
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/build ./build
+COPY --from=build /app/public ./public
+COPY --from=build /app/package.json ./
 
-WORKDIR /usr/src/app
+EXPOSE 3000
 
-COPY --from=deps /usr/src/app/node_modules /usr/src/app/node_modules
-ADD package.json ./
-RUN npm prune --omit=dev
-
-# Build the app
-FROM base as build
-
-WORKDIR /usr/src/app
-
-COPY --from=deps /usr/src/app/node_modules /usr/src/app/node_modules
-
-ADD . .
-RUN npm run build
-
-# Finally, build the production image with minimal footprint
-FROM base
-
-WORKDIR /usr/src/app
-
-COPY --from=production-deps /usr/src/app/node_modules /usr/src/app/node_modules
-
-COPY --from=build /usr/src/app/build /usr/src/app/build
-COPY --from=build /usr/src/app/public /usr/src/app/public
-COPY --from=build /usr/src/app/package.json /usr/src/app/package.json
-
-CMD [ "/bin/sh", "-c", "./node_modules/.bin/remix-serve ./build/index.js" ]
+CMD ["./node_modules/.bin/remix-serve", "./build/index.js"]
