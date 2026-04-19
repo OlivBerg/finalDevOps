@@ -1,8 +1,11 @@
-name: 'TF Apply'
+name: "TF Apply"
 on:
   push:
-    branches: [ main ]
-    paths: [ 'terraform/environments/main' ]
+    branches: [main]
+    paths:
+      - "terraform/**"
+    paths-ignore:
+      - "terraform/bootstrap/**"
 permissions:
   id-token: write
   contents: read
