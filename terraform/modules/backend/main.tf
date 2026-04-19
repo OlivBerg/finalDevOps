@@ -28,6 +28,6 @@ resource "azurerm_storage_container" "tfstate" {
   for_each = local.state_environments
 
   name                  = "tfstate-${each.key}"
-  storage_account_name  = azurerm_storage_account.tfstate.name
+  storage_account_id    = azurerm_storage_account.tfstate.id
   container_access_type = "private"
 }
