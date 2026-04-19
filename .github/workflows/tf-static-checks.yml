@@ -17,7 +17,6 @@ jobs:
         run: terraform fmt -check -recursive terraform/environments terraform/modules
 
       # No remote backend: fmt/validate do not need state. Avoids Azure OIDC on every branch
-      # (Entra federated identity must list each branch subject, e.g. refs/heads/main only).
       - name: Terraform Init
         run: terraform init -input=false -backend=false
         working-directory: ./terraform/environments/main
