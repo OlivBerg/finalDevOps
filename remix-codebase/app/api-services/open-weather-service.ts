@@ -1,15 +1,20 @@
-const API_KEY = process.env.WEATHER_API_KEY
-const TEN_MINUTES = 1000 * 60 * 10 // in milliseconds
+import Redis from 'ioredis'
 
-const resultsCache: Record<string, { lastFetch: number; data: unknown }> = {}
-function getCacheEntry(key: string) {
-  return resultsCache[key]
-}
-function setCacheEntry(key: string, data: unknown) {
-  resultsCache[key] = { lastFetch: Date.now(), data }
-}
-function isDataStale(lastFetch: number) {
-  return Date.now() - lastFetch > TEN_MINUTES
+const API_KEY = process.env.WEATHER_API_KEY
+const TEN_MINUTES_SECONDS = 60 * 10 // TTL in seconds for Redis
+
+let redis: Redis | null = null
+
+function getRedis(): Redis | null {
+  if (!redis && process.env.REDIS_HOST && process.env.REDIS_KEY) {
+    redis = new Redis({
+      host: process.env.REDIS_HOST,
+      port: parseInt(process.env.REDIS_PORT ?? '6380'),
+      password: process.env.REDIS_KEY,
+      tls: {},
+    })
+  }
+  return redis
 }
 
 interface FetchWeatherDataParams {
@@ -24,14 +29,21 @@ export async function fetchWeatherData({
 }: FetchWeatherDataParams) {
   const baseURL = 'https://api.openweathermap.org/data/2.5/weather'
   const queryString = `lat=${lat}&lon=${lon}&units=${units}&appid=${API_KEY}`
+  const cacheKey = `weather:${lat}:${lon}:${units}`
 
-  const cacheEntry = getCacheEntry(queryString)
-  if (cacheEntry && !isDataStale(cacheEntry.lastFetch)) {
-    return cacheEntry.data
+  const client = getRedis()
+  if (client) {
+    const cached = await client.get(cacheKey)
+    if (cached) return JSON.parse(cached)
   }
+
   const response = await fetch(`${baseURL}?${queryString}`)
   const data = await response.json()
-  setCacheEntry(queryString, data)
+
+  if (client) {
+    await client.set(cacheKey, JSON.stringify(data), 'EX', TEN_MINUTES_SECONDS)
+  }
+
   return data
 }
 

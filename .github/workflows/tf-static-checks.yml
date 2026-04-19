@@ -1,8 +1,9 @@
-name: 'PR 1: TF Static Checks'
-on: 
+name: "PR 1: TF Static Checks"
+on:
   push:
     paths:
-      - 'terraform/environments/main'
+      - "terraform/environments/**"
+      - "terraform/modules/**"
 
 jobs:
   static-analysis:
@@ -10,12 +11,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: hashicorp/setup-terraform@v3
-      
+
       - name: Terraform Format
-        run: terraform fmt -check -recursive
-      
+        run: terraform fmt -check -recursive terraform/environments terraform/modules
+
       - name: Terraform Init
-        run: terraform init -backend=false
+        run: terraform init -input=false -backend-config=backend.github.hcl
         working-directory: ./terraform/environments/main
 
       - name: Terraform Validate

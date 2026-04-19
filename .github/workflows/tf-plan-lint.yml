@@ -1,8 +1,10 @@
-name: 'TF Plan & Lint'
+name: "TF Plan & Lint"
 on:
   pull_request:
-    branches: [ main ]
-    paths: [ 'terraform/environments/main' ]
+    branches: [main]
+    paths:
+      - "terraform/environments/**"
+      - "terraform/modules/**"
 permissions:
   id-token: write
   contents: read
@@ -18,7 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: terraform-linters/setup-tflint@v4
-      
+
       - name: Run TFLint
         run: |
           tflint --init
@@ -26,9 +28,10 @@ jobs:
         working-directory: ./terraform/environments/main
 
       - uses: hashicorp/setup-terraform@v3
-      - run: terraform init
+      - name: Terraform Init
+        run: terraform init -input=false -backend-config=backend.github.test.hcl
         working-directory: ./terraform/environments/main
-        
+
       - name: Terraform Plan
         run: terraform plan -input=false
         working-directory: ./terraform/environments/main
