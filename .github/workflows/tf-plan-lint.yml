@@ -3,9 +3,8 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - "terraform/**"
-    paths-ignore:
-      - "terraform/bootstrap/**"
+      - "terraform/environments/**"
+      - "terraform/modules/**"
 permissions:
   id-token: write
   contents: read
