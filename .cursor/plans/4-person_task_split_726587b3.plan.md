@@ -6,19 +6,17 @@
 
 1. **Repository scaffolding**
 
-- Create `.gitignore` (include `*.tfstate`, `*.tfstate.backup`, `.terraform/`, `node_modules/`, `app/build/`, `.env`)
+- Create `.gitignore` (include `*.tfstate`, `*.tfstate.backup`, `.terraform/`, `node_modules/`, `build/`, `**/public/build/`, `.env`)
 - Create the folder structure outlined above
 - Set up branch protection rules on `main`
 - Add collaborators (team + `rlmckenney`)
 
-1. **Terraform backend module** -- `[infra/backend/](infra/backend/)`
+1. **Terraform backend (bootstrap + module)** -- `[terraform/bootstrap/](terraform/bootstrap/)` + `[terraform/modules/backend/](terraform/modules/backend/)`
 
-- `main.tf`: Create a resource group, storage account, and blob container for Terraform remote state
-- `variables.tf`: location, resource group name, storage account name, container name
-- `outputs.tf`: storage account name, container name, access key
-- This module is applied **once manually** to bootstrap the backend
+- **Module** (`terraform/modules/backend/`): `main.tf`, `variables.tf`, `outputs.tf` — resource group, storage account, blob container for Terraform remote state; outputs include storage account name, container name, access key (sensitive)
+- **Bootstrap** (`terraform/bootstrap/`): root config that applies the backend module **once manually** to bootstrap remote state (see `providers.tf`, `main.tf`, `outputs.tf`)
 
-1. **Network module** -- `[infra/modules/network/](infra/modules/network/)`
+1. **Network module** -- `[terraform/modules/network/](terraform/modules/network/)`
 
 - `main.tf`:
   - Resource group: `cst8918-final-project-group-<number>`
@@ -31,17 +29,11 @@
 - `variables.tf`: resource group name, location, group number
 - `outputs.tf`: VNet ID, subnet IDs (map)
 
-1. **Root Terraform configuration** -- `[infra/environments/](infra/environments/)`
+1. **Root Terraform configuration** -- `[terraform/environments/main/](terraform/environments/main/)`
 
-- `providers.tf`: configure `azurerm` provider and backend block pointing to the blob storage
+- `providers.tf`: configure `azurerm` provider and backend block pointing to the blob storage (use `backend.hcl.example` as a template for local `backend.hcl`, which is gitignored)
 - `main.tf`: wire together all modules (network, AKS, Redis, ACR) -- initially just network; others add their module calls via PRs
-- `variables.tf` / `terraform.tfvars`: shared variables (location, group number, etc.)
-
-### Deliverables / PRs
-
-- PR 1: Repo scaffolding + `.gitignore` + folder structure
-- PR 2: Terraform backend module
-- PR 3: Network module + root config wiring
+- `variables.tf` / `terraform.tfvars` (from `terraform.tfvars.example`): shared variables (location, group number, etc.)
 
 ---
 
@@ -49,7 +41,7 @@
 
 ### Responsibilities
 
-1. **AKS cluster module** -- `[infra/modules/aks-cluster/](infra/modules/aks-cluster/)`
+1. **AKS cluster module** -- `[terraform/modules/aks/](terraform/modules/aks/)` (scaffold present; implement module files here)
 
 - Reusable module accepting parameters for environment name, node count, auto-scaling, subnet ID, etc.
 - `main.tf`:
@@ -61,21 +53,21 @@
 - `variables.tf`: cluster name, location, resource group, DNS prefix, subnet ID, node count, min/max nodes, VM size, k8s version, environment tag
 - `outputs.tf`: cluster ID, kube_config (sensitive), host, client certificate
 
-1. **Test AKS instance** -- wired in `[infra/environments/main.tf](infra/environments/main.tf)`
+1. **Test AKS instance** -- wired in `[terraform/environments/main/main.tf](terraform/environments/main/main.tf)`
 
 - Call the AKS module with:
   - `node_count = 1`, auto-scaling disabled
   - subnet = `test-subnet` (from Person 1's network module)
   - `vm_size = "Standard_B2s"`, `kubernetes_version = "1.32"`
 
-1. **Prod AKS instance** -- wired in `[infra/environments/main.tf](infra/environments/main.tf)`
+1. **Prod AKS instance** -- wired in `[terraform/environments/main/main.tf](terraform/environments/main/main.tf)`
 
 - Call the AKS module with:
   - `min_count = 1`, `max_count = 3`, auto-scaling enabled
   - subnet = `prod-subnet`
   - `vm_size = "Standard_B2s"`, `kubernetes_version = "1.32"`
 
-1. **Redis module** -- `[infra/modules/redis/](infra/modules/redis/)`
+1. **Redis module** -- `[terraform/modules/redis/](terraform/modules/redis/)` (add alongside other modules)
 
 - `main.tf`:
   - `azurerm_redis_cache` resource
@@ -126,7 +118,7 @@
 1. **Workflow: Terraform apply** -- `[.github/workflows/tf-apply.yml](.github/workflows/tf-apply.yml)`
 
 - Trigger: `push` to `main` (merge of PR)
-- Condition: only when `infra/` files changed (use `paths` filter)
+- Condition: only when `terraform/` files changed (use `paths` filter)
 - Jobs:
   - `terraform init` + `terraform apply -auto-approve`
   - Use Azure OIDC authentication
@@ -134,17 +126,17 @@
 1. **Workflow: Docker build + push** -- `[.github/workflows/docker-build-push.yml](.github/workflows/docker-build-push.yml)`
 
 - Trigger: `pull_request` to `main`
-- Condition: only when `app/` files changed (use `paths` filter)
+- Condition: only when `remix-codebase/` files changed (use `paths` filter)
 - Jobs:
   - Login to ACR (`azure/docker-login` action)
-  - Build Docker image from `app/Dockerfile`
+  - Build Docker image from `remix-codebase/Dockerfile`
   - Tag with commit SHA (`${{ github.sha }}`)
   - Push to ACR
 
 1. **Workflow: Deploy app to AKS** -- `[.github/workflows/deploy-app.yml](.github/workflows/deploy-app.yml)`
 
 - Trigger: `pull_request` to `main` AND `push` to `main`
-- Condition: only when `app/` files changed
+- Condition: only when `remix-codebase/` files changed
 - Jobs:
   - On `pull_request`: deploy to **test** AKS cluster
     - `az aks get-credentials` for test cluster
@@ -166,14 +158,14 @@
 
 ### Responsibilities
 
-1. **Remix Weather Application** -- `[app/](app/)`
+1. **Remix Weather Application** -- `[remix-codebase/](remix-codebase/)` (includes `app/`, `public/`, `package.json`, etc.)
 
 - Copy/scaffold the Remix Weather App source code (from the week 3 assignment)
 - Ensure it reads Redis connection info from environment variables (`REDIS_HOST`, `REDIS_PORT`, `REDIS_KEY`)
 - Ensure it reads the weather API key from environment variables
 - `package.json` with all dependencies
 
-1. **Dockerfile** -- `[app/Dockerfile](app/Dockerfile)`
+1. **Dockerfile** -- `[remix-codebase/Dockerfile](remix-codebase/Dockerfile)`
 
 - Multi-stage build:
   - Stage 1: `node:20-alpine` -- install deps + build
@@ -181,7 +173,7 @@
 - Expose port 3000
 - Reference image on Docker Hub: `olivtheolive/cst8918-a01-weather-app`
 
-1. **ACR module** -- `[infra/modules/acr/](infra/modules/acr/)`
+1. **ACR module** -- `[terraform/modules/acr/](terraform/modules/acr/)` (add alongside other modules)
 
 - `main.tf`:
   - `azurerm_container_registry` resource
@@ -189,9 +181,9 @@
   - `admin_enabled = true`
 - `variables.tf`: name, location, resource group
 - `outputs.tf`: login server, admin username, admin password (sensitive)
-- Wire into root config `[infra/environments/main.tf](infra/environments/main.tf)`
+- Wire into root config `[terraform/environments/main/main.tf](terraform/environments/main/main.tf)`
 
-1. **Kubernetes manifests** -- `[k8s/](k8s/)`
+1. **Kubernetes manifests** -- `[k8s/](k8s/)` (not in repo yet; add at repo root when ready)
 
 - `deployment.yaml`:
   - Deployment named `weather-app`
@@ -204,7 +196,7 @@
   - Port 80 -> target port 3000
 - Optionally use Kustomize overlays for test vs prod
 
-1. **README.md** -- `[README.md](README.md)`
+1. **README** -- `[Readme.md](Readme.md)` (project root; capital **R** matches the repo)
 
 - Project description
 - Team member names + GitHub profile links
@@ -212,20 +204,3 @@
 - Prerequisites (Azure CLI, Terraform, kubectl, Docker)
 - Setup instructions (bootstrap backend, configure secrets, run workflows)
 - How to run locally
-
-### Deliverables / PRs
-
-- PR 1: Remix Weather App source + Dockerfile
-- PR 2: ACR Terraform module + root config wiring
-- PR 3: Kubernetes manifests (deployment + service)
-- PR 4: README.md with full documentation
-
----
-
-## Key Coordination Notes
-
-- Person 1 must merge the scaffold and backend PRs first -- everything else depends on the folder structure and backend config.
-- Person 2 depends on Person 1's network module for subnet IDs (use Terraform output references).
-- Person 3 can start the static checks workflow early (no Azure auth needed for `fmt`/`validate`), but plan/apply workflows need the federated identity and backend to exist.
-- Person 4 can work on the app and Dockerfile in parallel from the start, but the ACR module and K8s manifests depend on naming conventions from Person 2's AKS and Redis outputs.
-- All team members should review each other's PRs to satisfy the branch protection rules (at least 1 approving review, no self-approval).
