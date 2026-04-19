@@ -1,8 +1,10 @@
-name: 'PR 1: TF Static Checks'
-on: 
+name: "PR 1: TF Static Checks"
+on:
   push:
     paths:
-      - 'terraform/environments/main'
+      - "terraform/**"
+    paths-ignore:
+      - "terraform/bootstrap/**"
 
 jobs:
   static-analysis:
@@ -10,10 +12,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: hashicorp/setup-terraform@v3
-      
+
       - name: Terraform Format
-        run: terraform fmt -check -recursive
-      
+        run: terraform fmt -check -recursive terraform/environments terraform/modules
+
       - name: Terraform Init
         run: terraform init -backend=false
         working-directory: ./terraform/environments/main
