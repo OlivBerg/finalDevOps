@@ -2,9 +2,8 @@ name: "PR 1: TF Static Checks"
 on:
   push:
     paths:
-      - "terraform/**"
-    paths-ignore:
-      - "terraform/bootstrap/**"
+      - "terraform/environments/**"
+      - "terraform/modules/**"
 
 jobs:
   static-analysis:

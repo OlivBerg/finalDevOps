@@ -2,10 +2,10 @@ name: "TF Apply"
 on:
   push:
     branches: [main]
+    # Include env + modules only; terraform/bootstrap/ is excluded (bootstrap is manual).
     paths:
-      - "terraform/**"
-    paths-ignore:
-      - "terraform/bootstrap/**"
+      - "terraform/environments/**"
+      - "terraform/modules/**"
 permissions:
   id-token: write
   contents: read
