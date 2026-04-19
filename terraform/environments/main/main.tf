@@ -40,5 +40,3 @@ module "aks_prod" {
   kubernetes_version  = "1.32"
   environment         = "prod"
 }
-
-
