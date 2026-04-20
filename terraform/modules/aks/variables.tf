@@ -57,3 +57,14 @@ variable "environment" {
   description = "Environment tag (e.g. dev, test, prod)."
   type        = string
 }
+
+variable "api_server_authorized_ip_ranges" {
+  description = "CIDRs allowed for AKS API server access. Empty = no IP filter (not 0.0.0.0/0 when non-empty)."
+  type        = list(string)
+  default     = []
+}
+
+variable "log_analytics_workspace_id" {
+  description = "Resource ID of the Log Analytics workspace for OMS agent logging."
+  type        = string
+}
