@@ -48,9 +48,9 @@ variable "vm_size" {
 }
 
 variable "kubernetes_version" {
-  description = "Kubernetes version to use for the cluster."
+  description = "Kubernetes control plane version (minor, e.g. 1.33). Use 1.33+ on standard tier; Azure 1.32.x is LTS-only (Premium)."
   type        = string
-  default     = "1.32"
+  default     = "1.33"
 }
 
 variable "environment" {

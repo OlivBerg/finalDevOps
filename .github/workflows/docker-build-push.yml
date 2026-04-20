@@ -1,0 +1,60 @@
+name: "Docker build and push"
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "remix-codebase/**"
+  push:
+    branches: [main]
+    paths:
+      - "remix-codebase/**"
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    env:
+      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      ARM_USE_OIDC: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve image tag
+        id: meta
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "sha=${{ github.event.pull_request.head.sha }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "sha=${{ github.sha }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Log in to ACR
+        env:
+          ACR_LOGIN_SERVER: ${{ secrets.ACR_LOGIN_SERVER }}
+        run: |
+          set -euo pipefail
+          ACR_NAME="${ACR_LOGIN_SERVER%%.azurecr.io}"
+          az acr login --name "$ACR_NAME"
+
+      - name: Build and push image
+        env:
+          ACR_LOGIN_SERVER: ${{ secrets.ACR_LOGIN_SERVER }}
+          IMAGE_TAG: ${{ steps.meta.outputs.sha }}
+        run: |
+          set -euo pipefail
+          IMAGE="${ACR_LOGIN_SERVER}/weather-app:${IMAGE_TAG}"
+          docker build -t "$IMAGE" -f remix-codebase/Dockerfile remix-codebase
+          docker push "$IMAGE"

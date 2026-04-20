@@ -1,0 +1,89 @@
+name: "Deploy app to AKS"
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "remix-codebase/**"
+  push:
+    branches: [main]
+    paths:
+      - "remix-codebase/**"
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: deploy-app-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      ARM_USE_OIDC: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve image tag and cluster
+        id: ctx
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "sha=${{ github.event.pull_request.head.sha }}" >> "$GITHUB_OUTPUT"
+            echo "cluster=${{ secrets.AKS_TEST_CLUSTER_NAME }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "sha=${{ github.sha }}" >> "$GITHUB_OUTPUT"
+            echo "cluster=${{ secrets.AKS_PROD_CLUSTER_NAME }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Wait for image in ACR
+        env:
+          ACR_LOGIN_SERVER: ${{ secrets.ACR_LOGIN_SERVER }}
+          IMAGE_TAG: ${{ steps.ctx.outputs.sha }}
+        run: |
+          set -euo pipefail
+          ACR_NAME="${ACR_LOGIN_SERVER%%.azurecr.io}"
+          for attempt in $(seq 1 36); do
+            if az acr repository show-tags --name "$ACR_NAME" --repository weather-app --output tsv 2>/dev/null | grep -qx "$IMAGE_TAG"; then
+              echo "Image weather-app:$IMAGE_TAG is available."
+              exit 0
+            fi
+            echo "Waiting for image weather-app:$IMAGE_TAG (attempt $attempt/36)..."
+            sleep 10
+          done
+          echo "Timed out waiting for image weather-app:$IMAGE_TAG in ACR."
+          exit 1
+
+      - name: Configure kubectl
+        env:
+          AKS_RESOURCE_GROUP: ${{ secrets.AKS_RESOURCE_GROUP }}
+          CLUSTER_NAME: ${{ steps.ctx.outputs.cluster }}
+        run: |
+          set -euo pipefail
+          az aks get-credentials \
+            --resource-group "$AKS_RESOURCE_GROUP" \
+            --name "$CLUSTER_NAME" \
+            --overwrite-existing \
+            --admin
+
+      - name: Roll out deployment
+        env:
+          ACR_LOGIN_SERVER: ${{ secrets.ACR_LOGIN_SERVER }}
+          IMAGE_TAG: ${{ steps.ctx.outputs.sha }}
+        run: |
+          set -euo pipefail
+          IMAGE="${ACR_LOGIN_SERVER}/weather-app:${IMAGE_TAG}"
+          kubectl set image deployment/weather-app weather-app="$IMAGE" --namespace default
+          kubectl rollout status deployment/weather-app --namespace default --timeout=5m

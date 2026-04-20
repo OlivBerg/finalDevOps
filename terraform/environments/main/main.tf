@@ -29,7 +29,7 @@ module "aks_test" {
   min_count                       = 1
   max_count                       = 1 # auto-scaling disabled for test
   vm_size                         = "Standard_B2s"
-  kubernetes_version              = "1.32"
+  kubernetes_version              = "1.33"
   environment                     = "test"
   log_analytics_workspace_id      = azurerm_log_analytics_workspace.aks.id
   api_server_authorized_ip_ranges = var.api_server_authorized_ip_ranges
@@ -47,7 +47,7 @@ module "aks_prod" {
   min_count                       = 1
   max_count                       = 3 # auto-scaling enabled for prod
   vm_size                         = "Standard_B2s"
-  kubernetes_version              = "1.32"
+  kubernetes_version              = "1.33"
   environment                     = "prod"
   log_analytics_workspace_id      = azurerm_log_analytics_workspace.aks.id
   api_server_authorized_ip_ranges = var.api_server_authorized_ip_ranges
