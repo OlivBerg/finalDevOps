@@ -2,7 +2,6 @@ name: "TF Apply"
 on:
   push:
     branches: [main]
-    # Include env + modules only; terraform/bootstrap/ is excluded (bootstrap is manual).
     paths:
       - "terraform/environments/**"
       - "terraform/modules/**"
@@ -21,7 +20,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: hashicorp/setup-terraform@v3
-      - run: terraform init
+      - name: Terraform Init
+        run: terraform init -input=false -backend-config=backend.github.hcl
         working-directory: ./terraform/environments/main
       - run: terraform apply -auto-approve
         working-directory: ./terraform/environments/main
