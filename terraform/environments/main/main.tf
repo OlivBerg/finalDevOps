@@ -7,6 +7,16 @@ module "network" {
   tags                = var.tags
 }
 
+resource "azurerm_log_analytics_workspace" "aks" {
+  name                = "law-aks-${var.group_number}"
+  location            = var.location
+  resource_group_name = module.network.resource_group_name
+  sku                 = "PerGB2018"
+  retention_in_days   = 30
+
+  tags = var.tags
+}
+
 module "aks_test" {
   source = "../../modules/aks"
 
@@ -21,7 +31,7 @@ module "aks_test" {
   vm_size                         = "Standard_B2s"
   kubernetes_version              = "1.32"
   environment                     = "test"
-  log_analytics_workspace_id      = var.log_analytics_workspace_id
+  log_analytics_workspace_id      = azurerm_log_analytics_workspace.aks.id
   api_server_authorized_ip_ranges = var.api_server_authorized_ip_ranges
 }
 
@@ -39,6 +49,6 @@ module "aks_prod" {
   vm_size                         = "Standard_B2s"
   kubernetes_version              = "1.32"
   environment                     = "prod"
-  log_analytics_workspace_id      = var.log_analytics_workspace_id
+  log_analytics_workspace_id      = azurerm_log_analytics_workspace.aks.id
   api_server_authorized_ip_ranges = var.api_server_authorized_ip_ranges
 }

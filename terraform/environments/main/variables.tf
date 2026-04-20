@@ -22,12 +22,8 @@ variable "tags" {
   default     = {}
 }
 
-variable "log_analytics_workspace_id" {
-  description = "Resource ID of the Log Analytics workspace for AKS OMS agent logging."
-  type        = string
-}
-
 variable "api_server_authorized_ip_ranges" {
-  description = "List of IP ranges allowed to access the AKS API server."
+  description = "CIDRs allowed to reach the AKS API server (kubectl). Empty = no IP restriction (public API). Set e.g. [\"203.0.113.1/32\"] for home/office IP only."
   type        = list(string)
+  default     = []
 }

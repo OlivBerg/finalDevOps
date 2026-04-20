@@ -59,8 +59,9 @@ variable "environment" {
 }
 
 variable "api_server_authorized_ip_ranges" {
-  description = "List of IP ranges allowed to access the AKS API server. Must be a specific range, not 0.0.0.0/0."
+  description = "CIDRs allowed for AKS API server access. Empty = no IP filter (not 0.0.0.0/0 when non-empty)."
   type        = list(string)
+  default     = []
 }
 
 variable "log_analytics_workspace_id" {
