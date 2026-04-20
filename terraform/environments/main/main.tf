@@ -33,6 +33,8 @@ module "aks_test" {
   environment                     = "test"
   log_analytics_workspace_id      = azurerm_log_analytics_workspace.aks.id
   api_server_authorized_ip_ranges = var.api_server_authorized_ip_ranges
+  cluster_service_cidr            = "10.4.0.0/16"
+  cluster_dns_service_ip          = "10.4.0.10"
 }
 
 module "aks_prod" {
@@ -51,4 +53,6 @@ module "aks_prod" {
   environment                     = "prod"
   log_analytics_workspace_id      = azurerm_log_analytics_workspace.aks.id
   api_server_authorized_ip_ranges = var.api_server_authorized_ip_ranges
+  cluster_service_cidr            = "10.5.0.0/16"
+  cluster_dns_service_ip          = "10.5.0.10"
 }

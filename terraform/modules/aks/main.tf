@@ -28,9 +28,12 @@ resource "azurerm_kubernetes_cluster" "main" {
   role_based_access_control_enabled = true
 
   # HIGH: configure network policy
+  # service_cidr must not overlap the VNet or subnets (AKS defaults to 10.0.0.0/16, which conflicts with prod-subnet).
   network_profile {
     network_plugin = "azure"
     network_policy = "azure"
+    service_cidr   = var.cluster_service_cidr
+    dns_service_ip = var.cluster_dns_service_ip
   }
 
   # MEDIUM: enable OMS agent logging
