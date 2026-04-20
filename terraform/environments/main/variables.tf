@@ -21,3 +21,13 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "log_analytics_workspace_id" {
+  description = "Resource ID of the Log Analytics workspace for AKS OMS agent logging."
+  type        = string
+}
+
+variable "api_server_authorized_ip_ranges" {
+  description = "List of IP ranges allowed to access the AKS API server."
+  type        = list(string)
+}
