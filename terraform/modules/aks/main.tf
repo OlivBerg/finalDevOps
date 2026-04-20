@@ -6,7 +6,9 @@ resource "azurerm_kubernetes_cluster" "main" {
   kubernetes_version  = var.kubernetes_version
 
   # CRITICAL: limit API server access to specific IP ranges
-  api_server_authorized_ip_ranges = var.api_server_authorized_ip_ranges
+  api_server_access_profile {
+    authorized_ip_ranges = var.api_server_authorized_ip_ranges
+  }
 
   default_node_pool {
     name                = "default"
