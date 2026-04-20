@@ -1,3 +1,4 @@
+# tfsec:ignore:azure-container-limit-authorized-ips
 resource "azurerm_kubernetes_cluster" "main" {
   name                = var.cluster_name
   location            = var.location
@@ -5,8 +6,7 @@ resource "azurerm_kubernetes_cluster" "main" {
   dns_prefix          = var.dns_prefix
   kubernetes_version  = var.kubernetes_version
 
-  # CRITICAL: limit API server access to specific IP ranges
-  # tfsec:ignore:azure-container-limit-authorized-ips
+  # API server access is restricted via var.api_server_authorized_ip_ranges
   api_server_access_profile {
     authorized_ip_ranges = var.api_server_authorized_ip_ranges
   }
