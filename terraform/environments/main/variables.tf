@@ -30,5 +30,4 @@ variable "log_analytics_workspace_id" {
 variable "api_server_authorized_ip_ranges" {
   description = "List of IP ranges allowed to access the AKS API server."
   type        = list(string)
-  default     = ["0.0.0.0/0"]
 }

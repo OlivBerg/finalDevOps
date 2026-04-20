@@ -59,9 +59,8 @@ variable "environment" {
 }
 
 variable "api_server_authorized_ip_ranges" {
-  description = "List of IP ranges allowed to access the Kubernetes API server. Use [\"0.0.0.0/0\"] only for dev/test."
+  description = "List of IP ranges allowed to access the AKS API server. Must be a specific range, not 0.0.0.0/0."
   type        = list(string)
-  default     = ["0.0.0.0/0"]
 }
 
 variable "log_analytics_workspace_id" {
