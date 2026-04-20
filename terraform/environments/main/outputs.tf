@@ -10,6 +10,11 @@ output "subnet_ids" {
   value = module.network.subnet_ids
 }
 
+output "log_analytics_workspace_id" {
+  description = "Log Analytics workspace used by AKS OMS agents."
+  value       = azurerm_log_analytics_workspace.aks.id
+}
+
 # ---------------------------------------------------------------------------
 # AKS outputs
 # ---------------------------------------------------------------------------

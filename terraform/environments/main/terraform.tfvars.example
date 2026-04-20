@@ -6,3 +6,6 @@ location     = "canadacentral"
 tags = {
   project = "cst8918-final"
 }
+
+# Optional: restrict kubectl to your public IP (default [] = no API server IP filter).
+# api_server_authorized_ip_ranges = ["203.0.113.10/32"]
