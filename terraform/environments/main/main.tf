@@ -69,7 +69,7 @@ module "acr" {
 module "redis_test" {
   source = "../../modules/redis"
 
-  redis_name          = "redis-test-${var.group_number}"
+  redis_name          = "cst8918-redis-test-${var.group_number}"
   location            = var.location
   resource_group_name = module.network.resource_group_name
   capacity            = 1
