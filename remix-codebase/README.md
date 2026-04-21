@@ -374,3 +374,4 @@ pulumi destroy
 ## Next Steps
 
 The instructions for Part Two of this practice scenario are in the [README-h03.md](https://github.com/rlmckenney/cst8918-w24-a03-weather-pulumi/blob/main/README-h03.md) file in this repo.
+
