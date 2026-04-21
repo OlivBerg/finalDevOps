@@ -4,12 +4,12 @@
 
 ## Team
 
-| Name | GitHub |
-|------|--------|
-| Olivie Bergeron | [@OlivBerg](https://github.com/OlivBerg) |
-| Desmond Murphy | [@murp0428](https://github.com/murp0428) |
-| Dharti Patel | [@Patel-Creates](https://github.com/Patel-Creates) |
-| Fayz Reshid | [@resh2024](https://github.com/resh2024) |
+| Name            | GitHub                                             |
+| --------------- | -------------------------------------------------- |
+| Olivie Bergeron | [@OlivBerg](https://github.com/OlivBerg)           |
+| Desmond Murphy  | [@murp0428](https://github.com/murp0428)           |
+| Dharti Patel    | [@Patel-Creates](https://github.com/Patel-Creates) |
+| Fayz Reshid     | [@resh2024](https://github.com/resh2024)           |
 
 ## Project Overview
 
@@ -87,12 +87,12 @@ terraform plan
 
 The GitHub Actions workflows require the following secrets set in the repository:
 
-| Secret | Description |
-|--------|-------------|
-| `AZURE_CLIENT_ID` | App registration client ID (federated identity) |
-| `AZURE_TENANT_ID` | Azure AD tenant ID |
-| `AZURE_SUBSCRIPTION_ID` | Azure subscription ID |
-| `WEATHER_API_KEY` | API key for the weather data service |
+| Secret                  | Description                                     |
+| ----------------------- | ----------------------------------------------- |
+| `AZURE_CLIENT_ID`       | App registration client ID (federated identity) |
+| `AZURE_TENANT_ID`       | Azure AD tenant ID                              |
+| `AZURE_SUBSCRIPTION_ID` | Azure subscription ID                           |
+| `WEATHER_API_KEY`       | API key for the weather data service            |
 
 ### 5. Deploy K8s secrets to the cluster
 
@@ -143,13 +143,13 @@ kubectl apply -k k8s/overlays/prod   # prod environment
 
 ## GitHub Actions Workflows
 
-| Workflow | Trigger | Purpose |
-|----------|---------|---------|
-| `tf-static-checks.yml` | Push to any branch | `terraform fmt`, `validate`, `tfsec` |
-| `tf-plan-lint.yml` | PR to main | `tflint` + `terraform plan` |
-| `tf-apply.yml` | Merge to main | `terraform apply` |
-| `docker-build-push.yml` | PR to main (app changes) | Build + push Docker image to ACR |
-| `deploy-app.yml` | PR/merge to main (app changes) | Deploy to test / prod AKS |
+| Workflow                | Trigger                        | Purpose                              |
+| ----------------------- | ------------------------------ | ------------------------------------ |
+| `tf-static-checks.yml`  | Push to any branch             | `terraform fmt`, `validate`, `tfsec` |
+| `tf-plan-lint.yml`      | PR to main                     | `tflint` + `terraform plan`          |
+| `tf-apply.yml`          | Merge to main                  | `terraform apply`                    |
+| `docker-build-push.yml` | PR to main (app changes)       | Build + push Docker image to ACR     |
+| `deploy-app.yml`        | PR/merge to main (app changes) | Deploy to test / prod AKS            |
 
 ### Live application (prod)
 
@@ -167,13 +167,13 @@ The app is deployed and accessible at **http://4.172.19.7** (prod AKS LoadBalanc
 
 #### Individual workflow runs
 
-| Workflow | Screenshot |
-|----------|------------|
-| TF Static Checks | ![TF Static Checks](docs/screenshots/workflow-tf-static.png) |
-| TF Plan & Lint | ![TF Plan & Lint](docs/screenshots/workflow-tf-plan.png) |
-| TF Apply | ![TF Apply](docs/screenshots/workflow-tf-apply.png) |
+| Workflow            | Screenshot                                                         |
+| ------------------- | ------------------------------------------------------------------ |
+| TF Static Checks    | ![TF Static Checks](docs/screenshots/workflow-tf-static.png)       |
+| TF Plan & Lint      | ![TF Plan & Lint](docs/screenshots/workflow-tf-plan.png)           |
+| TF Apply            | ![TF Apply](docs/screenshots/workflow-tf-apply.png)                |
 | Docker Build & Push | ![Docker Build & Push](docs/screenshots/workflow-docker-build.png) |
-| Deploy App to AKS | ![Deploy App to AKS](docs/screenshots/workflow-deploy-app.png) |
+| Deploy App to AKS   | ![Deploy App to AKS](docs/screenshots/workflow-deploy-app.png)     |
 
 ---
 
@@ -313,3 +313,7 @@ terraform apply
 │   └── overlays/            # test and prod environment overrides
 └── .github/workflows/       # GitHub Actions CI/CD workflows
 ```
+
+## AI Disclosure
+
+This project used AI assistance (Claude) during planning and development. AI was used to help scaffold Terraform module structure, suggest security best practices (tfsec fixes, RBAC, network policies), assist with debugging provider version conflicts, and draft documentation. All AI-generated content was reviewed, tested, and validated by team members before being committed.
