@@ -14,6 +14,8 @@ spec:
       labels:
         app: weather-app
     spec:
+      imagePullSecrets:
+        - name: acr-pull-secret
       containers:
         - name: weather-app
           image: cst8918group4acr.azurecr.io/weather-app:latest
