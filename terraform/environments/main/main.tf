@@ -56,3 +56,27 @@ module "aks_prod" {
   cluster_service_cidr            = "10.5.0.0/16"
   cluster_dns_service_ip          = "10.5.0.10"
 }
+
+module "redis_test" {
+  source = "../../modules/redis"
+
+  redis_name          = "redis-test-${var.group_number}"
+  location            = var.location
+  resource_group_name = module.network.resource_group_name
+  capacity            = 1
+  family              = "C"
+  sku_name            = "Standard"
+  environment         = "test"
+}
+
+module "redis_prod" {
+  source = "../../modules/redis"
+
+  redis_name          = "redis-prod-${var.group_number}"
+  location            = var.location
+  resource_group_name = module.network.resource_group_name
+  capacity            = 1
+  family              = "C"
+  sku_name            = "Standard"
+  environment         = "prod"
+}
