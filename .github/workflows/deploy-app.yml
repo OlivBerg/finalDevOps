@@ -84,6 +84,15 @@ jobs:
           IMAGE_TAG: ${{ steps.ctx.outputs.sha }}
         run: |
           set -euo pipefail
-          IMAGE="${ACR_LOGIN_SERVER}/weather-app:${IMAGE_TAG}"
-          kubectl set image deployment/weather-app weather-app="$IMAGE" --namespace default
-          kubectl rollout status deployment/weather-app --namespace default --timeout=5m
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            OVERLAY="k8s/overlays/test"
+            DEPLOYMENT="test-weather-app"
+          else
+            OVERLAY="k8s/overlays/prod"
+            DEPLOYMENT="prod-weather-app"
+          fi
+          cd "$OVERLAY"
+          kustomize edit set image "${ACR_LOGIN_SERVER}/weather-app:${IMAGE_TAG}"
+          cd -
+          kubectl apply -k "$OVERLAY"
+          kubectl rollout status deployment/"$DEPLOYMENT" --namespace default --timeout=5m
