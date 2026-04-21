@@ -151,7 +151,29 @@ kubectl apply -k k8s/overlays/prod   # prod environment
 | `docker-build-push.yml` | PR to main (app changes) | Build + push Docker image to ACR |
 | `deploy-app.yml` | PR/merge to main (app changes) | Deploy to test / prod AKS |
 
-<!-- Add screenshot of completed workflow runs here once all workflows are passing -->
+### Live application (prod)
+
+The app is deployed and accessible at **http://4.172.19.7** (prod AKS LoadBalancer).
+
+![Remix Weather app running on prod AKS](docs/screenshots/app-running.png)
+
+### Azure resources provisioned
+
+![Azure resource group cst8918-final-project-group-4](docs/screenshots/azure-resources.png)
+
+### All workflows passing
+
+![All workflows green](docs/screenshots/workflows-overview.png)
+
+#### Individual workflow runs
+
+| Workflow | Screenshot |
+|----------|------------|
+| TF Static Checks | ![TF Static Checks](docs/screenshots/workflow-tf-static.png) |
+| TF Plan & Lint | ![TF Plan & Lint](docs/screenshots/workflow-tf-plan.png) |
+| TF Apply | ![TF Apply](docs/screenshots/workflow-tf-apply.png) |
+| Docker Build & Push | ![Docker Build & Push](docs/screenshots/workflow-docker-build.png) |
+| Deploy App to AKS | ![Deploy App to AKS](docs/screenshots/workflow-deploy-app.png) |
 
 ---
 
