@@ -56,3 +56,12 @@ module "aks_prod" {
   cluster_service_cidr            = "10.5.0.0/16"
   cluster_dns_service_ip          = "10.5.0.10"
 }
+
+module "acr" {
+  source = "../../modules/acr"
+
+  name                = "cst8918group${var.group_number}acr"
+  location            = var.location
+  resource_group_name = module.network.resource_group_name
+  tags                = var.tags
+}
