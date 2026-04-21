@@ -39,4 +39,28 @@ output "aks_prod_resource_group" {
   value       = module.aks_prod.resource_group_name
 }
 
+# ---------------------------------------------------------------------------
+# Redis outputs
+# ---------------------------------------------------------------------------
+
+output "redis_test_hostname" {
+  description = "Hostname of the test Redis cache."
+  value       = module.redis_test.hostname
+}
+
+output "redis_test_ssl_port" {
+  description = "SSL port of the test Redis cache."
+  value       = module.redis_test.ssl_port
+}
+
+output "redis_prod_hostname" {
+  description = "Hostname of the prod Redis cache."
+  value       = module.redis_prod.hostname
+}
+
+output "redis_prod_ssl_port" {
+  description = "SSL port of the prod Redis cache."
+  value       = module.redis_prod.ssl_port
+}
+
 
