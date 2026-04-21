@@ -1,5 +1,6 @@
-CST8918 - DevOps: Infrastructure as Code  
+CST8918 - DevOps: Infrastructure as Code
 Prof: Robert McKenney
+<!-- dummy change by dharti to test workflow -->
 
 # LAB-A03 Pulumi Weather App
 
