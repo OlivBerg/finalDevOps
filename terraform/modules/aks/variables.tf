@@ -48,12 +48,35 @@ variable "vm_size" {
 }
 
 variable "kubernetes_version" {
-  description = "Kubernetes version to use for the cluster."
+  description = "Kubernetes control plane version (minor, e.g. 1.33). Use 1.33+ on standard tier; Azure 1.32.x is LTS-only (Premium)."
   type        = string
-  default     = "1.32"
+  default     = "1.33"
 }
 
 variable "environment" {
   description = "Environment tag (e.g. dev, test, prod)."
+  type        = string
+}
+
+variable "cluster_service_cidr" {
+  description = "CIDR for Kubernetes services (ClusterIP). Must not overlap the VNet address space or any subnet."
+  type        = string
+  default     = "10.4.0.0/16"
+}
+
+variable "cluster_dns_service_ip" {
+  description = "IP for kube-dns/CoreDNS within cluster_service_cidr (typically the .10 address in that range)."
+  type        = string
+  default     = "10.4.0.10"
+}
+
+variable "api_server_authorized_ip_ranges" {
+  description = "CIDRs allowed for AKS API server access. Empty = no IP filter (not 0.0.0.0/0 when non-empty)."
+  type        = list(string)
+  default     = []
+}
+
+variable "log_analytics_workspace_id" {
+  description = "Resource ID of the Log Analytics workspace for OMS agent logging."
   type        = string
 }
